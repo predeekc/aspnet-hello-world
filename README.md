@@ -1,13 +1,8 @@
-aspnet-hello-world
-==================
-
-This sample is broken into multiple steps. The 
-
 # Running the completed sample
 
-Make sure version 0.1-alpha-build-0446 of the K Runtime is installed. See the install instructions at [https://github.com/aspnet/home](https://github.com/aspnet/home).
+Make sure version **0.1-alpha-build-0446** of the K Runtime is installed. See the install instructions at [https://github.com/aspnet/home](https://github.com/aspnet/home).
 
-If you have multiple builds of the runtime installed select version 0.1-alpha-build-0446.
+If you have multiple builds of the runtime installed select **version 0.1-alpha-build-0446**.
 
 ```cmd
 kvm use 0.1-alpha-build-0446
@@ -105,7 +100,7 @@ public void Configure(IBuilder app)
     app.Run(MyHandler);         
 }
 ```
-At this point save the file and run the application using `k run`. Once the server is running, navigate to [http://localhost:5001](http://localhost:5001). The page should load. The image load will fail for now.
+At this point save the file and run the application using `k web`. Once the server is running, navigate to [http://localhost:5001](http://localhost:5001). The page should load. The image load will fail for now.
 
 # Step 2: Middleware
 
@@ -159,14 +154,47 @@ public void Configure(IBuilder app)
 }
 ```
 
-Finally the new extension method is called to register the middleware.  Run the application using `k run`. Once the server is running, navigate to [http://localhost:5001](http://localhost:5001). The page should load and contain a cache-control header in the HTTP response.
+Finally the new extension method is called to register the middleware.  Run the application using `k web`. Once the server is running, navigate to [http://localhost:5001](http://localhost:5001). The page should load and contain a cache-control header in the HTTP response.
 
 # Step 3: StaticFile Middleware
-  - Register the static file handler
-  - See that image now loads
 
-# Step 4: Map Middleware
-  - Add map section for /private path
-  - Move custom middleware into this mapped version only
-  - Show that only items in the /private path have the cache response header
+Some middleware components ship as part of the framework.  The **StaticFileMiddleware** component can be used to serve static files from your webserver.  If it's placed early in the pipeline, it will check to see if the requested file exists on the filesystem and return it.  If not, it passes the request down the pipeline.
+
+```C#
+public void Configure(IBuilder app)
+{
+  // Step 2c: Use the middleware
+  app.UseMyPrivateMiddleware();
+
+  // Step 3: Use static files middleware
+  app.UseStaticFiles();
+
+  // Step 1b: Use the simple handler
+  app.Run(MyHandler);         
+}
+```
+
+When the application is run with `k web` and opened in the browser, the StaticFile middleware will server the image embedded in the page.
   
+# Step 4: Map Middleware
+
+Another piece of useful middleware is the **MapMiddleware**.  It checks the URL requested and if it doesn't match a registered path, it continues down the pipeline by calling the next middleware component.  If it does match, execution is diverted to a new pipeline that's configured independently.  In this sample it's used to route all requests to the **/private** path to a different pipeline.
+
+```C#
+public void Configure(IBuilder app)
+{
+  // Step 4: Add a pipeline for child folders
+  app.Map("/private", childApp => {
+    childApp.UseMyPrivateMiddleware();
+    childApp.Run(MyHandler);
+  });
+
+  // Step 3: Use static files middleware
+  app.UseStaticFiles();
+
+  // Step 1b: Use the simple handler
+  app.Run(MyHandler);         
+}
+```
+
+Now when the application is run using `k web`, requests to the /private namespace will have the **cache-control** response header, but requests to the rest of the application will not.
