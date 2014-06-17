@@ -30,11 +30,7 @@ namespace KWebStartup
         {
             Console.WriteLine("{0} - {1}", context.Request.Method, context.Request.Path.ToString());            
 
-            var writer = new StreamWriter(context.Response.Body);
-            writer.Write("<html><head><title>Sample Page</title></head><body>Hello World!<br/><img src='images/helloWorld.png'/></body></html>");
-            writer.Flush();
-
-            return Task.FromResult<object>(null);
+            return context.Response.WriteAsync("<html><head><title>Sample Page</title></head><body>Hello World!<br/><img src='images/helloWorld.png'/></body></html>");
         }
     }
 
