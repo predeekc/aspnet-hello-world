@@ -21,7 +21,7 @@ namespace KWebStartup
             // Step 3: Use static files middleware
             app.UseStaticFiles();
 
-            // Step 1b: Use athe simple handler
+            // Step 1b: Use the simple handler
             app.Run(MyHandler);         
         }
 
