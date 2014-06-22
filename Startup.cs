@@ -15,6 +15,9 @@ namespace AspNetHelloWorld
             // Step 2c: Use the middleware
             app.UseMyPrivateMiddleware();
 
+            // Step 3: Use static files middleware
+            app.UseStaticFiles();
+        
             // Step 1b: Use the simple handler
             app.Run(MyHandler);         
         }
