@@ -1,12 +1,12 @@
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Builder.Extensions;
-
+using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
-using System;
 
-namespace KWebStartup
+using Microsoft.AspNet.Builder;
+using Microsoft.AspNet.Builder.Extensions;
+using Microsoft.AspNet.Http;
+
+namespace AspNetHelloWorld
 {
     public class Startup
     {
