@@ -12,8 +12,11 @@ namespace AspNetHelloWorld
     {
         public void Configure(IBuilder app)
         {
-            // Step 2c: Use the middleware
-            app.UseMyPrivateMiddleware();
+            // Step 4: Add a pipeline for child folders
+            app.Map("/private", childApp => {
+                childApp.UseMyPrivateMiddleware();
+                childApp.Run(MyHandler);
+            });
 
             // Step 3: Use static files middleware
             app.UseStaticFiles();
